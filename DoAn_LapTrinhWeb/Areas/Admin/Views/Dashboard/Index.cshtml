@@ -1,0 +1,347 @@
+﻿@{
+    ViewBag.Title = "Bảng Điều Khiển";
+    Layout = "~/Areas/Admin/Views/Shared/LayoutAdmin.cshtml";
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+}
+@section scripts{
+    <!--biểu đồ chart-->
+    <script src="~/Scripts/admin_js/highcharts.js"></script>
+    <script src="~/Scripts/admin_js/custom_highcharts.js"></script>
+    <script src="~/Scripts/my_js/count_visited.js"></script>
+    <script src="~/Scripts/admin_js/datetimepicker_custom.js"></script>
+}
+<!--begin::Content-->
+<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+    <!--begin::Toolbar-->
+    <div class="toolbar" id="kt_toolbar">
+        <!--begin::Container-->
+        <div id="kt_toolbar_container" class="container-fluid d-flex flex-stack">
+            <!--begin::Page title-->
+            <div data-kt-place="true" data-kt-place-mode="prepend" data-kt-place-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}" class="page-title d-flex align-items-center me-3 flex-wrap mb-5 mb-lg-0 lh-1">
+                <!--begin::Title-->
+                <h1 class="d-flex align-items-center text-dark fw-bolder my-1 fs-3">Thống kê</h1>
+                <!--end::Title-->
+                <!--begin::Separator-->
+                <span class="h-20px border-gray-200 border-start mx-4"></span>
+                <!--end::Separator-->
+                <!--begin::Breadcrumb-->
+                <ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 my-1">
+                    <!--begin::Item-->
+                    <li class="breadcrumb-item text-muted">
+                        <a href="@Url.Action("Index", "Dashboard")" class="text-muted text-hover-primary">Bảng điều khiển</a>
+                    </li>
+                    <!--end::Item-->
+                    <!--begin::Item-->
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-200 w-5px h-2px"></span>
+                    </li>
+                    <!--end::Item-->
+                    <!--begin::Item-->
+                    <li class="breadcrumb-item text-dark">Thống kê</li>
+                    <!--end::Item-->
+                </ul>
+                <!--end::Breadcrumb-->
+            </div>
+            <!--end::Page title-->
+            <!--begin::Actions-->
+            <div class="d-flex align-items-center py-1">
+                <!--end::Input group-->
+                <!--begin::Filer-->
+                <div>
+                    <a href="#" class="btn btn-sm btn-flex btn-light btn-active-primary fw-bolder" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
+                        <!--begin::Svg Icon | path: icons/duotone/Text/Filter.svg-->
+                        <span class="svg-icon svg-icon-5 svg-icon-gray-500 me-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <rect x="0" y="0" width="24" height="24" />
+                                    <path d="M5,4 L19,4 C19.2761424,4 19.5,4.22385763 19.5,4.5 C19.5,4.60818511 19.4649111,4.71345191 19.4,4.8 L14,12 L14,20.190983 C14,20.4671254 13.7761424,20.690983 13.5,20.690983 C13.4223775,20.690983 13.3458209,20.6729105 13.2763932,20.6381966 L10,19 L10,12 L4.6,4.8 C4.43431458,4.5790861 4.4790861,4.26568542 4.7,4.1 C4.78654809,4.03508894 4.89181489,4 5,4 Z" fill="#000000" />
+                                </g>
+                            </svg>
+                        </span>
+                        <!--end::Svg Icon-->
+                        @if (ViewBag.SortBy == null)
+                        {
+                            <span>Bộ lọc</span>
+                        }
+                        else
+                        {
+                            @ViewBag.SortBy
+                        }
+                    </a>
+                    <!--begin::Menu-->
+                    <div class="menu menu-sub menu-sub-dropdown w-250px w-md-300px" data-kt-menu="true">
+                        <!--begin::Menu separator-->
+                        <div class="separator border-gray-200"></div>
+                        <!--end::Menu separator-->
+                        <!--begin::Form-->
+                        <div class="px-7 py-5">
+                            <!--begin::Input group-->
+                            <div class="mb-2 border-bottom-3">
+                                <!--begin::Label-->
+                                <a class="text-gray-700 text-hover-primary fw-bold " href="@Url.Action("Index", "DashBoard", new { sortOrder = ViewBag.TodaySortParm})">Hôm Nay</a>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Input group-->
+                            <!--begin::Input group-->
+                            <div class="mb-2 border-bottom-3">
+                                <!--begin::Label-->
+                                <a class="text-gray-700 text-hover-primary fw-bold " href="@Url.Action("Index", "DashBoard", new { sortOrder = ViewBag.DaysAgoSortParm})">7 ngày qua</a>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Input group-->
+                            <!--begin::Input group-->
+                            <div class="mb-2 ">
+                                <!--begin::Label-->
+                                <a class="text-gray-700 text-hover-primary fw-bold" href="@Url.Action("Index", "DashBoard", new { sortOrder = ViewBag.MonthAgoSortParm})">Tháng trước</a>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Input group-->
+                            <!--begin::Input group-->
+                            <div class="mb-2 ">
+                                <!--begin::Label-->
+                                <a class="text-gray-700 text-hover-primary fw-bold" href="@Url.Action("Index", "DashBoard", new { sortOrder = ViewBag.MonthSortParm})">Tháng này</a>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Input group-->
+                            <!--begin::Input group-->
+                            <div class="mb-2 ">
+                                <!--begin::Label-->
+                                <a class="text-gray-700 text-hover-primary fw-bold" href="@Url.Action("Index", "DashBoard", new { sortOrder = ViewBag.YearSortParm})">Năm nay</a>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Input group-->
+                        </div>
+                        <!--end::Form-->
+                    </div>
+                    <!--end::Menu-->
+                </div>
+                <!--end::Filter-->
+            </div>
+            <!--end::Actions-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::Toolbar-->
+    <!--begin::Post-->
+    <div class="post d-flex flex-column-fluid" id="kt_post">
+        <!--begin::Container-->
+        <div id="kt_content_container" class="container">
+            <!--begin::Card-->
+            <div class="card">
+                <!--begin::Row-->
+                <!--Toàn bộ ViewBag... đều nằm ở Action"Index" Controller "Dashboard"-->
+                <div class="row gy-5 gx-xl-8 mt-1 pb-2 ps-5 pe-5">
+                    <div class="d-flex justify-content-center"><h3>Thống kê @ViewBag.DateSort</h3> </div>
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics1">
+                            <div class="inner">
+                                <h3>@ViewBag.CountOrderWaitting</h3>
+                                <p>Đơn hàng mới</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-cart-plus"></i>
+                            </div>
+                            <a href="@Url.Action("OrderIndex", "Orders", new { sortOrder=ViewBag.WaitingOrder})" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics9">
+                            <div class="inner">
+                                <h3>@ViewBag.CountOrderProcessing</h3>
+                                <p>Đơn hàng đang xử lý</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-cart"></i>
+                            </div>
+                            <a href="@Url.Action("OrderIndex", "Orders", new { sortOrder=ViewBag.ProcessingOrder })" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics2">
+                            <div class="inner">
+                                <h3>@ViewBag.CountOrderComplete</h3>
+                                <p>Đơn hàng đã hoàn thành</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-cart-check-fill"></i>
+                            </div>
+                            <a href="@Url.Action("OrderIndex", "Orders", new { sortOrder=ViewBag.CompleteOrder })" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics3">
+                            <div class="inner">
+                                <h3>@ViewBag.CountOrderCancled</h3>
+                                <p>Đơn hàng đã hủy</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-cart-x-fill"></i>
+                            </div>
+                            <a href="@Url.Action("OrderTrash", "Orders")" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                </div>
+                <!--end::Row-->
+                <!--begin::Row-->
+                <div class="row gy-5 pb-2 gx-xl-8 ps-5 pe-5">
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics10">
+                            <div class="inner">
+                                <h3>@ViewBag.CountProducts</h3>
+                                <p>Sản phẩm mới</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <a href="@Url.Action("ProductIndex", "ProductsAdmin")" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics11">
+                            <div class="inner">
+                                <h3>@ViewBag.CountProductSale</h3>
+                                <p>Số lượng sản phẩm đã bán</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-clipboard-check"></i>
+                            </div>
+                            <a class="small-box-footer">Sản phẩm đã bán</a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics12">
+                            <div class="inner">
+                                <h3>@ViewBag.CountFeedback</h3>
+                                <p>Lượt đánh giá sản phẩm</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-star-half"></i>
+                            </div>
+                            <a href="@Url.Action("FeedbackIndex", "Feedbacks")" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics4">
+                            <div class="inner">
+                                @if (ViewBag.CountTurnover1 == 0)
+                                {
+                                    <h3>0₫</h3>
+                                }
+                                else
+                                {
+                                    <h3>@ViewBag.CountTurnover1.ToString("#,###₫", culture.NumberFormat)  </h3>
+                                }
+                                <p>Tổng doanh thu @ViewBag.DateSort</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
+                            <a class="small-box-footer">Tổng doanh thu</a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                </div>
+                <!--end::Row-->
+                <!--begin::Row-->
+                <div class="row gy-5 gx-xl-8 ps-5 pe-5">
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics5">
+                            <div class="inner">
+                                <h3>@ViewBag.CountPost</h3>
+                                <p>Bài viết đã tạo</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-newspaper"></i>
+                            </div>
+                            <a href="@Url.Action("NewsIndex", "NewsAdmin")" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics6">
+                            <div class="inner">
+                                <h3 id="counvisited">0</h3>
+                                <p>Khách đang online</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-person-bounding-box"></i>
+                            </div>
+                            <a class="small-box-footer">Khách online</a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics7">
+                            <div class="inner">
+                                <h3>@ViewBag.CountUsers</h3>
+                                <p>Thành viên mới</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-person-plus"></i>
+                            </div>
+                            <a href="@Url.Action("UserIndex", "Roles")" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-lg-3">
+                        <!-- small box -->
+                        <div class="small-box bg_Statistics8">
+                            <div class="inner">
+                                <h3>@ViewBag.CountContact</h3>
+                                <p>Liên hệ khách hàng</p>
+                            </div>
+                            <div class="icon">
+                                <i class="bi bi-telephone-plus"></i>
+                            </div>
+                            <a href="@Url.Action("ContactIndex", "Contacts")" class="small-box-footer">Xem thêm <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                </div>
+                <!--end::Row-->
+                <!--begin::Chart-->
+                <div class="row pt-xl-2 pb-xl-10 mt-5">
+                    <!--high_charts | path :Scripts/admin_js/custom_highcharts.js-->
+                    <div id="top_10_charts" class="high_charts"></div>
+                </div>
+                <!--end::Chart-->
+            </div>
+            <!--end::Card-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::Post-->
+</div>
+<!--end::content-->
